@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Top Menu ── -->
+    <menuitem id="menu_spa_root"
+              name="Spa Dispatch"
+              sequence="50"
+              web_icon="spa_dispatch,static/description/icon.png"/>
+
+    <!-- ── Main sections ── -->
+    <menuitem id="menu_spa_dispatch"
+              name="Dispatch Board"
+              parent="menu_spa_root"
+              action="action_dispatch_board"
+              sequence="10"
+              groups="group_spa_agent"/>
+
+    <menuitem id="menu_spa_appointments"
+              name="All Appointments"
+              parent="menu_spa_root"
+              action="action_spa_appointment"
+              sequence="20"/>
+
+    <menuitem id="menu_driver_view"
+              name="My Route Today"
+              parent="menu_spa_root"
+              action="action_driver_view"
+              sequence="30"/>
+
+    <!-- ── Configuration ── -->
+    <menuitem id="menu_spa_config"
+              name="Configuration"
+              parent="menu_spa_root"
+              sequence="90"
+              groups="group_spa_manager"/>
+
+    <menuitem id="menu_spa_cars"
+              name="Vehicles"
+              parent="menu_spa_config"
+              action="action_spa_car"
+              sequence="10"/>
+
+    <menuitem id="menu_spa_teams"
+              name="Teams"
+              parent="menu_spa_config"
+              action="action_spa_team"
+              sequence="20"/>
+
+</odoo>

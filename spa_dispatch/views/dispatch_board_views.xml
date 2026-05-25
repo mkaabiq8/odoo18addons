@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Dispatch Board: Kanban grouped by car_id, showing Team A and Team B
+        appointments side by side for today. Agents use this as their
+        primary scheduling screen.
+    -->
+
+    <!-- ── Kanban grouped by Car ── -->
+    <record id="view_dispatch_board_kanban" model="ir.ui.view">
+        <field name="name">spa.appointment.dispatch_board.kanban</field>
+        <field name="model">spa.appointment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="car_id"
+                    class="o_kanban_small_column"
+                    quick_create="False"
+                    group_create="False"
+                    group_delete="False">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="service_date"/>
+                <field name="service_end_date"/>
+                <field name="car_id"/>
+                <field name="team_slot"/>
+                <field name="team_id"/>
+                <field name="address"/>
+                <field name="status"/>
+                <field name="color"/>
+                <field name="total_amount"/>
+                <field name="priority"/>
+                <field name="duration"/>
+                <templates>
+                    <t t-name="kanban-card">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click
+                                           #{ record.status.raw_value == 'done' ? 'border-success' :
+                                              record.status.raw_value == 'cancelled' ? 'border-danger' :
+                                              record.status.raw_value in ['traveling','arrived','in_progress'] ? 'border-info' : '' }">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top mb-2">
+                                    <div class="o_kanban_record_headings">
+                                        <span t-attf-class="badge #{ record.team_slot.raw_value == 'a' ? 'bg-primary' : 'bg-warning text-dark' } me-1">
+                                            Team <t t-esc="(record.team_slot.raw_value || '').toUpperCase()"/>
+                                        </span>
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <field name="priority" widget="priority"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="fw-bold"><field name="customer_id"/></div>
+                                    <div class="text-muted small">
+                                        <i class="fa fa-clock-o me-1"/>
+                                        <field name="service_date" options="{'format': 'HH:mm'}"/>
+                                        — <field name="service_end_date" options="{'format': 'HH:mm'}"/>
+                                        (<field name="duration"/>h)
+                                    </div>
+                                    <div class="small mt-1">
+                                        <i class="fa fa-map-marker me-1"/>
+                                        <field name="address"/>
+                                    </div>
+                                    <div class="small">
+                                        <i class="fa fa-users me-1"/>
+                                        <field name="team_id"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <field name="status" widget="badge"
+                                           decoration-success="status=='done'"
+                                           decoration-danger="status=='cancelled'"
+                                           decoration-info="status in ('traveling','arrived','in_progress')"
+                                           decoration-warning="status=='confirmed'"/>
+                                    <span class="ms-auto fw-bold">
+                                        <field name="total_amount" widget="monetary"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ── Action: Dispatch Board ── -->
+    <record id="action_dispatch_board" model="ir.actions.act_window">
+        <field name="name">Dispatch Board</field>
+        <field name="res_model">spa.appointment</field>
+        <field name="view_mode">kanban,list,calendar</field>
+        <field name="views">[(ref('view_dispatch_board_kanban'), 'kanban'),
+                             (ref('spa_dispatch.view_spa_appointment_list'), 'list'),
+                             (ref('spa_dispatch.view_spa_appointment_calendar'), 'calendar')]</field>
+        <field name="domain">[('status', 'not in', ['cancelled'])]</field>
+        <field name="context">{
+            'search_default_today': 1,
+            'group_by': 'car_id'
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No appointments today — all clear!
+            </p>
+        </field>
+    </record>
+
+</odoo>

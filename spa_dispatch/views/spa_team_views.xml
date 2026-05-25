@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List ── -->
+    <record id="view_spa_team_list" model="ir.ui.view">
+        <field name="name">spa.team.list</field>
+        <field name="model">spa.team</field>
+        <field name="arch" type="xml">
+            <list string="Teams">
+                <field name="car_id"/>
+                <field name="slot"/>
+                <field name="name"/>
+                <field name="member_ids" widget="many2many_tags"/>
+                <field name="appointment_count" string="Appointments"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form ── -->
+    <record id="view_spa_team_form" model="ir.ui.view">
+        <field name="name">spa.team.form</field>
+        <field name="model">spa.team</field>
+        <field name="arch" type="xml">
+            <form string="Team">
+                <header>
+                    <button name="action_view_appointments" type="object"
+                            string="View Appointments" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_appointments" type="object"
+                                class="oe_stat_button" icon="fa-calendar">
+                            <field name="appointment_count" widget="statinfo" string="Appointments"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Team name..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="car_id"/>
+                            <field name="slot"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Members" name="members">
+                            <field name="member_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Action ── -->
+    <record id="action_spa_team" model="ir.actions.act_window">
+        <field name="name">Teams</field>
+        <field name="res_model">spa.team</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

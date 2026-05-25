@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Driver Route Wizard Form ── -->
+    <record id="view_driver_route_wizard_form" model="ir.ui.view">
+        <field name="name">spa.driver.route.wizard.form</field>
+        <field name="model">spa.driver.route.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Driver Route Plan">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fa fa-car me-2"/>
+                        This shows the recommended drop-off order for your two teams today.
+                    </div>
+                    <group>
+                        <group string="Select">
+                            <field name="car_id"/>
+                            <field name="route_date"/>
+                            <field name="driver_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Today's Appointments"/>
+                    <group>
+                        <group string="Team A Appointment">
+                            <field name="appointment_a_id" readonly="1"/>
+                            <field name="address_a" readonly="1" string="Address"/>
+                            <field name="time_a" readonly="1" string="Time"/>
+                        </group>
+                        <group string="Team B Appointment">
+                            <field name="appointment_b_id" readonly="1"/>
+                            <field name="address_b" readonly="1" string="Address"/>
+                            <field name="time_b" readonly="1" string="Time"/>
+                        </group>
+                    </group>
+                    <separator string="Recommended Route"/>
+                    <group>
+                        <field name="distance_km" readonly="1" string="Distance between stops (km)"/>
+                        <field name="route_suggestion" readonly="1" string="Route Plan" nolabel="1"
+                               widget="text"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-primary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Action: Driver View ── -->
+    <record id="action_driver_view" model="ir.actions.act_window">
+        <field name="name">My Route Today</field>
+        <field name="res_model">spa.appointment</field>
+        <field name="view_mode">list,calendar</field>
+        <field name="domain">[('driver_id', '=', uid), ('status', 'not in', ['cancelled', 'done'])]</field>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No trips assigned for today!
+            </p>
+        </field>
+    </record>
+
+</odoo>

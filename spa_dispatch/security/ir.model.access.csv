@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_spa_car_manager,spa.car manager,model_spa_car,spa_dispatch.group_spa_manager,1,1,1,1
+access_spa_car_agent,spa.car agent,model_spa_car,spa_dispatch.group_spa_agent,1,0,0,0
+access_spa_car_user,spa.car user,model_spa_car,spa_dispatch.group_spa_user,1,0,0,0
+access_spa_team_manager,spa.team manager,model_spa_team,spa_dispatch.group_spa_manager,1,1,1,1
+access_spa_team_agent,spa.team agent,model_spa_team,spa_dispatch.group_spa_agent,1,0,0,0
+access_spa_team_user,spa.team user,model_spa_team,spa_dispatch.group_spa_user,1,0,0,0
+access_spa_appointment_manager,spa.appointment manager,model_spa_appointment,spa_dispatch.group_spa_manager,1,1,1,1
+access_spa_appointment_agent,spa.appointment agent,model_spa_appointment,spa_dispatch.group_spa_agent,1,1,1,0
+access_spa_appointment_user,spa.appointment user,model_spa_appointment,spa_dispatch.group_spa_user,1,1,0,0
+access_spa_appointment_line_manager,spa.appointment.line manager,model_spa_appointment_line,spa_dispatch.group_spa_manager,1,1,1,1
+access_spa_appointment_line_agent,spa.appointment.line agent,model_spa_appointment_line,spa_dispatch.group_spa_agent,1,1,1,1
+access_spa_appointment_line_user,spa.appointment.line user,model_spa_appointment_line,spa_dispatch.group_spa_user,1,0,0,0
+access_driver_route_wizard,spa.driver.route.wizard,model_spa_driver_route_wizard,spa_dispatch.group_spa_agent,1,1,1,1
+access_team_status_wizard,spa.team.status.wizard,model_spa_team_status_wizard,spa_dispatch.group_spa_user,1,1,1,1
