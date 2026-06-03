@@ -125,6 +125,32 @@ class SpaAppointment(models.Model):
             if rec.customer_id and not rec.phone:
                 rec.phone = rec.customer_id.phone or rec.customer_id.mobile
 
+    def _compute_display_name(self):
+        """Rich display name shown on calendar cards and breadcrumbs."""
+        status_labels = {
+            'draft':       'Pending',
+            'confirmed':   'Confirmed',
+            'traveling':   'Traveling',
+            'arrived':     'Arrived',
+            'in_progress': 'In Progress',
+            'done':        'Done',
+            'cancelled':   'Cancelled',
+        }
+        slot_labels = {'a': 'Team A', 'b': 'Team B'}
+        for rec in self:
+            lines = [rec.name or 'New']
+            if rec.customer_id:
+                lines.append(rec.customer_id.name)
+            details = ' · '.join(filter(None, [
+                rec.car_id.name if rec.car_id else '',
+                rec.city_id.name if rec.city_id else '',
+                slot_labels.get(rec.team_slot, '') if rec.team_slot else '',
+                status_labels.get(rec.status, ''),
+            ]))
+            if details:
+                lines.append(details)
+            rec.display_name = '\n'.join(lines)
+
     @api.depends('service_date', 'duration')
     def _compute_end_date(self):
         for rec in self:
