@@ -138,14 +138,18 @@ class SpaAppointment(models.Model):
         }
         slot_labels = {'a': 'Team A', 'b': 'Team B'}
         for rec in self:
-            lines = [rec.name or 'New']
+            # Line 1: reference + status — always visible even on small cards
+            status_str = status_labels.get(rec.status, '')
+            ref = rec.name or 'New'
+            lines = [f'{ref}  [{status_str}]' if status_str else ref]
+            # Line 2: customer name
             if rec.customer_id:
                 lines.append(rec.customer_id.name)
+            # Line 3: zone · city · team slot
             details = ' · '.join(filter(None, [
                 rec.car_id.name if rec.car_id else '',
                 rec.city_id.name if rec.city_id else '',
                 slot_labels.get(rec.team_slot, '') if rec.team_slot else '',
-                status_labels.get(rec.status, ''),
             ]))
             if details:
                 lines.append(details)
