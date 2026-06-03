@@ -226,7 +226,7 @@
                 <field name="total_amount"/>
                 <field name="priority"/>
                 <templates>
-                    <t t-name="kanban-card">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_card oe_kanban_global_click o_kanban_record_has_image_fill">
                             <div class="oe_kanban_content">
                                 <div class="o_kanban_record_top">

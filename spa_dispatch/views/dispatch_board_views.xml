@@ -31,7 +31,7 @@
                 <field name="priority"/>
                 <field name="duration"/>
                 <templates>
-                    <t t-name="kanban-card">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_card oe_kanban_global_click
                                            #{ record.status.raw_value == 'done' ? 'border-success' :
                                               record.status.raw_value == 'cancelled' ? 'border-danger' :
