@@ -35,7 +35,7 @@
               groups="group_spa_manager"/>
 
     <menuitem id="menu_spa_cars"
-              name="Vehicles"
+              name="Zones"
               parent="menu_spa_config"
               action="action_spa_car"
               sequence="10"/>
@@ -46,16 +46,10 @@
               action="action_spa_team"
               sequence="20"/>
 
-    <menuitem id="menu_spa_zones"
-              name="Zones"
-              parent="menu_spa_config"
-              action="action_spa_zone"
-              sequence="30"/>
-
     <menuitem id="menu_spa_cities"
               name="Cities"
               parent="menu_spa_config"
               action="action_spa_city"
-              sequence="40"/>
+              sequence="30"/>
 
 </odoo>

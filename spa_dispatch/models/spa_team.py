@@ -10,7 +10,7 @@ class SpaTeam(models.Model):
     name = fields.Char('Team Name', required=True, tracking=True)
     zone_id = fields.Many2one('spa.zone', string='Zone / Area', tracking=True)
     car_id = fields.Many2one(
-        'spa.car', string='Assigned Car', required=True, tracking=True, ondelete='cascade'
+        'spa.car', string='Zone', required=True, tracking=True, ondelete='cascade'
     )
     slot = fields.Selection(
         [('a', 'Team A'), ('b', 'Team B')],

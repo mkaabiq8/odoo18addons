@@ -10,7 +10,7 @@
                 <field name="name"/>
                 <field name="customer_id"/>
                 <field name="phone" string="Phone / Mobile"/>
-                <field name="car_id"/>
+                <field name="car_id" string="Zone"/>
                 <field name="team_id"/>
                 <field name="agent_id"/>
                 <field name="state_id" string="State / Area"/>
@@ -31,7 +31,7 @@
                 <filter string="My Appointments" name="my_appointments"
                         domain="['|', ('agent_id','=',uid), ('technician_ids','=',uid)]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Car"       name="group_car"    context="{'group_by': 'car_id'}"/>
+                    <filter string="Zone"      name="group_car"    context="{'group_by': 'car_id'}"/>
                     <filter string="Team"      name="group_team"   context="{'group_by': 'team_id'}"/>
                     <filter string="Status"    name="group_status" context="{'group_by': 'status'}"/>
                     <filter string="State"     name="group_state"  context="{'group_by': 'state_id'}"/>
@@ -56,7 +56,7 @@
                 <field name="phone"/>
                 <field name="service_date"/>
                 <field name="duration"/>
-                <field name="car_id"/>
+                <field name="car_id" string="Zone"/>
                 <field name="team_slot"/>
                 <field name="team_id"/>
                 <field name="state_id" optional="show"/>
@@ -136,7 +136,7 @@
                     <group>
                         <!-- Dispatch -->
                         <group string="Dispatch">
-                            <field name="car_id"/>
+                            <field name="car_id" string="Zone"/>
                             <field name="team_slot"/>
                             <field name="team_id"
                                    domain="[('car_id','=',car_id),('slot','=',team_slot)]"/>
@@ -160,6 +160,12 @@
                                    placeholder="https://maps.google.com/..."/>
                         </group>
                     </group>
+                    <!-- Customer Notes (visible directly on form) -->
+                    <group string="Customer Notes">
+                        <field name="customer_notes"
+                               placeholder="Customer preferences, allergies, special requests..."
+                               nolabel="1"/>
+                    </group>
                     <!-- Services -->
                     <notebook>
                         <page string="Services" name="services">
@@ -177,11 +183,8 @@
                                        widget="monetary"/>
                             </group>
                         </page>
-                        <page string="Notes" name="notes">
-                            <group>
-                                <field name="notes" placeholder="Internal notes..." nolabel="1"/>
-                                <field name="customer_notes" placeholder="Customer notes / preferences..." nolabel="1"/>
-                            </group>
+                        <page string="Internal Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes..." nolabel="1"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -197,8 +200,9 @@
         <field name="arch" type="xml">
             <calendar string="Appointments" date_start="service_date" date_stop="service_end_date"
                       color="car_id" mode="week" quick_create="False">
-                <field name="customer_id"/>
-                <field name="car_id"/>
+                <field name="customer_id" string="Customer"/>
+                <field name="car_id" string="Zone"/>
+                <field name="city_id" string="City"/>
                 <field name="team_slot"/>
                 <field name="status"/>
             </calendar>

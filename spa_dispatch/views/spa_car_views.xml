@@ -6,7 +6,7 @@
         <field name="name">spa.car.list</field>
         <field name="model">spa.car</field>
         <field name="arch" type="xml">
-            <list string="Vehicles">
+            <list string="Zones">
                 <field name="name"/>
                 <field name="driver_id"/>
                 <field name="team_a_id"/>
@@ -23,7 +23,7 @@
         <field name="name">spa.car.form</field>
         <field name="model">spa.car</field>
         <field name="arch" type="xml">
-            <form string="Vehicle">
+            <form string="Zone">
                 <header>
                     <button name="action_view_appointments" type="object"
                             string="View Appointments" class="btn-secondary"/>
@@ -40,10 +40,10 @@
                         </button>
                     </div>
                     <div class="oe_title">
-                        <h1><field name="name" placeholder="Vehicle name..."/></h1>
+                        <h1><field name="name" placeholder="Zone name..."/></h1>
                     </div>
                     <group>
-                        <group string="Vehicle Info">
+                        <group string="Zone Info">
                             <field name="driver_id"/>
                             <field name="active"/>
                         </group>
@@ -112,7 +112,7 @@
 
     <!-- ── Action ── -->
     <record id="action_spa_car" model="ir.actions.act_window">
-        <field name="name">Vehicles</field>
+        <field name="name">Zones</field>
         <field name="res_model">spa.car</field>
         <field name="view_mode">kanban,list,form</field>
     </record>

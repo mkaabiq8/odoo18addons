@@ -3,11 +3,11 @@ from odoo import models, fields, api
 
 class SpaCar(models.Model):
     _name = 'spa.car'
-    _description = 'Spa Service Vehicle'
+    _description = 'Spa Service Zone'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
-    name = fields.Char('Vehicle Name', required=True, tracking=True)
+    name = fields.Char('Zone Name', required=True, tracking=True)
     driver_id = fields.Many2one(
         'res.users', string='Driver', required=True, tracking=True
     )

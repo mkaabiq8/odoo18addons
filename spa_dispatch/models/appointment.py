@@ -51,7 +51,7 @@ class SpaAppointment(models.Model):
     )
 
     # ─── Dispatch ────────────────────────────────────────────────────────────
-    car_id = fields.Many2one('spa.car', string='Car', tracking=True)
+    car_id = fields.Many2one('spa.car', string='Zone', tracking=True)
     team_slot = fields.Selection(
         [('a', 'Team A'), ('b', 'Team B')],
         string='Team Slot', tracking=True
@@ -357,7 +357,7 @@ class SpaAppointmentLine(models.Model):
     )
     service_id = fields.Many2one(
         'product.product', string='Service', required=True,
-        domain=[('type', '=', 'service')]
+        domain=[('sale_ok', '=', True)]
     )
     description = fields.Char(
         'Description', compute='_compute_description', store=True, readonly=False
