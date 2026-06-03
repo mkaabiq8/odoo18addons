@@ -9,7 +9,6 @@
             <list string="Vehicles">
                 <field name="name"/>
                 <field name="driver_id"/>
-                <field name="fleet_vehicle_id"/>
                 <field name="team_a_id"/>
                 <field name="team_b_id"/>
                 <field name="today_appointment_count" string="Today"/>
@@ -46,7 +45,6 @@
                     <group>
                         <group string="Vehicle Info">
                             <field name="driver_id"/>
-                            <field name="fleet_vehicle_id"/>
                             <field name="active"/>
                         </group>
                         <group string="Teams">

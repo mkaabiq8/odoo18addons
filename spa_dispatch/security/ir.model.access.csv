@@ -1,4 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_spa_zone_manager,spa.zone manager,model_spa_zone,spa_dispatch.group_spa_manager,1,1,1,1
+access_spa_zone_agent,spa.zone agent,model_spa_zone,spa_dispatch.group_spa_agent,1,0,0,0
+access_spa_zone_user,spa.zone user,model_spa_zone,spa_dispatch.group_spa_user,1,0,0,0
+access_spa_city_manager,spa.city manager,model_spa_city,spa_dispatch.group_spa_manager,1,1,1,1
+access_spa_city_agent,spa.city agent,model_spa_city,spa_dispatch.group_spa_agent,1,0,0,0
+access_spa_city_user,spa.city user,model_spa_city,spa_dispatch.group_spa_user,1,0,0,0
 access_spa_car_manager,spa.car manager,model_spa_car,spa_dispatch.group_spa_manager,1,1,1,1
 access_spa_car_agent,spa.car agent,model_spa_car,spa_dispatch.group_spa_agent,1,0,0,0
 access_spa_car_user,spa.car user,model_spa_car,spa_dispatch.group_spa_user,1,0,0,0

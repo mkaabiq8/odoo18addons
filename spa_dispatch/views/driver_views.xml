@@ -25,16 +25,17 @@
                             <field name="appointment_a_id" readonly="1"/>
                             <field name="address_a" readonly="1" string="Address"/>
                             <field name="time_a" readonly="1" string="Time"/>
+                            <field name="map_link_a" readonly="1" string="Map Link" widget="url"/>
                         </group>
                         <group string="Team B Appointment">
                             <field name="appointment_b_id" readonly="1"/>
                             <field name="address_b" readonly="1" string="Address"/>
                             <field name="time_b" readonly="1" string="Time"/>
+                            <field name="map_link_b" readonly="1" string="Map Link" widget="url"/>
                         </group>
                     </group>
                     <separator string="Recommended Route"/>
                     <group>
-                        <field name="distance_km" readonly="1" string="Distance between stops (km)"/>
                         <field name="route_suggestion" readonly="1" string="Route Plan" nolabel="1"
                                widget="text"/>
                     </group>

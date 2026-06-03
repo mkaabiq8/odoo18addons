@@ -8,6 +8,7 @@ class SpaTeam(models.Model):
     _rec_name = 'display_name'
 
     name = fields.Char('Team Name', required=True, tracking=True)
+    zone_id = fields.Many2one('spa.zone', string='Zone / Area', tracking=True)
     car_id = fields.Many2one(
         'spa.car', string='Assigned Car', required=True, tracking=True, ondelete='cascade'
     )

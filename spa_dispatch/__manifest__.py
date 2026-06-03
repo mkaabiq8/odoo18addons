@@ -12,11 +12,13 @@
         - Conflict detection prevents double-booking
     """,
     'author': 'Jolity',
-    'depends': ['base', 'mail', 'fleet', 'sale_management'],
+    'depends': ['base', 'mail', 'sale_management', 'payment'],
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
+        'views/spa_zone_views.xml',
+        'views/spa_city_views.xml',
         'views/spa_car_views.xml',
         'views/spa_team_views.xml',
         'views/appointment_views.xml',

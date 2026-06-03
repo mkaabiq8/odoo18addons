@@ -8,10 +8,6 @@ class SpaCar(models.Model):
     _rec_name = 'name'
 
     name = fields.Char('Vehicle Name', required=True, tracking=True)
-    fleet_vehicle_id = fields.Many2one(
-        'fleet.vehicle', string='Fleet Vehicle',
-        help='Link to the Fleet module vehicle record'
-    )
     driver_id = fields.Many2one(
         'res.users', string='Driver', required=True, tracking=True
     )

@@ -1,7 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import timedelta
-import math
 
 
 class SpaAppointment(models.Model):
@@ -22,8 +21,17 @@ class SpaAppointment(models.Model):
     )
     phone = fields.Char('Phone', compute='_compute_phone', store=True, readonly=False)
     address = fields.Char('Service Address', required=True, tracking=True)
-    latitude = fields.Float('Latitude', digits=(10, 7))
-    longitude = fields.Float('Longitude', digits=(10, 7))
+
+    # ─── Location ────────────────────────────────────────────────────────────
+    state_id = fields.Many2one(
+        'res.country.state', string='State / Area', tracking=True
+    )
+    city_id = fields.Many2one(
+        'spa.city', string='City',
+        domain="[('state_id', '=', state_id)]",
+        tracking=True
+    )
+    google_map_link = fields.Char('Google Maps Link')
 
     # ─── Schedule ────────────────────────────────────────────────────────────
     service_date = fields.Datetime(
@@ -87,7 +95,7 @@ class SpaAppointment(models.Model):
     )
 
     # ─────────────────────────────────────────────────────────────────────────
-    # Sequence
+    # Sequence + create/write overrides
     # ─────────────────────────────────────────────────────────────────────────
 
     @api.model_create_multi
@@ -97,7 +105,15 @@ class SpaAppointment(models.Model):
                 vals['name'] = (
                     self.env['ir.sequence'].next_by_code('spa.appointment') or 'New'
                 )
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._sync_to_partner()
+        return records
+
+    def write(self, vals):
+        result = super().write(vals)
+        if {'state_id', 'city_id', 'address', 'phone'} & set(vals.keys()):
+            self._sync_to_partner()
+        return result
 
     # ─────────────────────────────────────────────────────────────────────────
     # Computed fields
@@ -158,16 +174,45 @@ class SpaAppointment(models.Model):
 
     @api.onchange('customer_id')
     def _onchange_customer_id(self):
+        """Auto-fill phone, address, state and city from the customer record."""
         if self.customer_id:
             partner = self.customer_id
             self.phone = partner.phone or partner.mobile
+            if partner.state_id:
+                self.state_id = partner.state_id
+            if partner.spa_city_id:
+                self.city_id = partner.spa_city_id
             if partner.street:
-                parts = [
-                    partner.street,
-                    partner.street2,
-                    partner.city,
-                ]
+                parts = [partner.street, partner.street2, partner.city]
                 self.address = ', '.join(p for p in parts if p)
+
+    @api.onchange('state_id')
+    def _onchange_state_id(self):
+        """Clear city when state changes to prevent a state/city mismatch."""
+        if self.city_id and self.city_id.state_id != self.state_id:
+            self.city_id = False
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Partner sync
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _sync_to_partner(self):
+        """Write location fields back to the customer so they auto-fill next time."""
+        for rec in self:
+            if not rec.customer_id:
+                continue
+            partner = rec.customer_id
+            vals = {}
+            if rec.state_id and rec.state_id != partner.state_id:
+                vals['state_id'] = rec.state_id.id
+            if rec.city_id and rec.city_id != partner.spa_city_id:
+                vals['spa_city_id'] = rec.city_id.id
+            if rec.address and not partner.street:
+                vals['street'] = rec.address
+            if rec.phone and not partner.phone and not partner.mobile:
+                vals['phone'] = rec.phone
+            if vals:
+                partner.sudo().write(vals)
 
     # ─────────────────────────────────────────────────────────────────────────
     # Status transitions
@@ -205,7 +250,30 @@ class SpaAppointment(models.Model):
                 )
 
     # ─────────────────────────────────────────────────────────────────────────
-    # Conflict validation
+    # Payment link
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def action_generate_payment_link(self):
+        """Open the Odoo payment link wizard pre-filled with appointment data."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Generate Payment Link'),
+            'res_model': 'payment.link.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_res_model': 'spa.appointment',
+                'default_res_id': self.id,
+                'default_amount': self.total_amount,
+                'default_currency_id': self.env.company.currency_id.id,
+                'default_partner_id': self.customer_id.id if self.customer_id else False,
+                'default_description': self.name,
+            },
+        }
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Constraints
     # ─────────────────────────────────────────────────────────────────────────
 
     @api.constrains('service_date', 'duration', 'car_id', 'team_slot', 'status')
@@ -234,18 +302,29 @@ class SpaAppointment(models.Model):
                     'other': overlaps[0].name,
                 })
 
-    # ─────────────────────────────────────────────────────────────────────────
-    # Driver route helper
-    # ─────────────────────────────────────────────────────────────────────────
+    @api.constrains('phone', 'status')
+    def _check_unique_active_phone(self):
+        """Block duplicate phone numbers across all non-closed appointments."""
+        for rec in self:
+            if not rec.phone or rec.status in ('done', 'cancelled'):
+                continue
+            duplicate = self.search([
+                ('id', '!=', rec.id),
+                ('phone', '=', rec.phone),
+                ('status', 'not in', ['done', 'cancelled']),
+            ], limit=1)
+            if duplicate:
+                raise ValidationError(_(
+                    'Phone %(phone)s is already linked to active appointment %(ref)s. '
+                    'Complete or cancel that appointment first, or use a different number.'
+                ) % {
+                    'phone': rec.phone,
+                    'ref': duplicate.name,
+                })
 
-    def _haversine_distance(self, lat1, lon1, lat2, lon2):
-        """Return distance in km between two GPS points."""
-        R = 6371
-        phi1, phi2 = math.radians(lat1), math.radians(lat2)
-        dphi = math.radians(lat2 - lat1)
-        dlam = math.radians(lon2 - lon1)
-        a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlam / 2) ** 2
-        return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    # ─────────────────────────────────────────────────────────────────────────
+    # Driver route
+    # ─────────────────────────────────────────────────────────────────────────
 
     def action_driver_route(self):
         """Open the driver route wizard for this car's day appointments."""
@@ -258,7 +337,9 @@ class SpaAppointment(models.Model):
             'target': 'new',
             'context': {
                 'default_car_id': self.car_id.id,
-                'default_route_date': self.service_date.date() if self.service_date else fields.Date.today(),
+                'default_route_date': (
+                    self.service_date.date() if self.service_date else fields.Date.today()
+                ),
             },
         }
 
@@ -278,7 +359,9 @@ class SpaAppointmentLine(models.Model):
         'product.product', string='Service', required=True,
         domain=[('type', '=', 'service')]
     )
-    description = fields.Char('Description', compute='_compute_description', store=True, readonly=False)
+    description = fields.Char(
+        'Description', compute='_compute_description', store=True, readonly=False
+    )
     quantity = fields.Float('Qty', default=1.0)
     price_unit = fields.Float('Unit Price')
     subtotal = fields.Float(compute='_compute_subtotal', store=True)

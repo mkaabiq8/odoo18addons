@@ -9,9 +9,12 @@
             <search string="Appointments">
                 <field name="name"/>
                 <field name="customer_id"/>
+                <field name="phone" string="Phone / Mobile"/>
                 <field name="car_id"/>
                 <field name="team_id"/>
                 <field name="agent_id"/>
+                <field name="state_id" string="State / Area"/>
+                <field name="city_id" string="City"/>
                 <filter string="Today" name="today"
                         domain="[('service_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
                                  ('service_date', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
@@ -28,10 +31,12 @@
                 <filter string="My Appointments" name="my_appointments"
                         domain="['|', ('agent_id','=',uid), ('technician_ids','=',uid)]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Car"    name="group_car"    context="{'group_by': 'car_id'}"/>
-                    <filter string="Team"   name="group_team"   context="{'group_by': 'team_id'}"/>
-                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
-                    <filter string="Date"   name="group_date"   context="{'group_by': 'service_date:day'}"/>
+                    <filter string="Car"       name="group_car"    context="{'group_by': 'car_id'}"/>
+                    <filter string="Team"      name="group_team"   context="{'group_by': 'team_id'}"/>
+                    <filter string="Status"    name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="State"     name="group_state"  context="{'group_by': 'state_id'}"/>
+                    <filter string="City"      name="group_city"   context="{'group_by': 'city_id'}"/>
+                    <filter string="Date"      name="group_date"   context="{'group_by': 'service_date:day'}"/>
                 </group>
             </search>
         </field>
@@ -54,6 +59,8 @@
                 <field name="car_id"/>
                 <field name="team_slot"/>
                 <field name="team_id"/>
+                <field name="state_id" optional="show"/>
+                <field name="city_id" optional="show"/>
                 <field name="address"/>
                 <field name="total_amount" sum="Total"/>
                 <field name="status" widget="badge"
@@ -94,6 +101,11 @@
                     <button name="action_done" type="object" string="Complete"
                             class="btn-success"
                             invisible="status not in ['in_progress']"/>
+                    <!-- Payment link -->
+                    <button name="action_generate_payment_link" type="object"
+                            string="Generate Payment Link"
+                            class="btn-secondary"
+                            invisible="status == 'cancelled'"/>
                     <!-- Driver route -->
                     <button name="action_driver_route" type="object" string="Driver Route"
                             class="btn-secondary"
@@ -111,7 +123,6 @@
                         <group string="Customer">
                             <field name="customer_id"/>
                             <field name="phone"/>
-                            <field name="address"/>
                             <field name="crm_lead_id" optional="show"/>
                         </group>
                         <!-- Scheduling -->
@@ -136,10 +147,18 @@
                             <field name="technician_ids" widget="many2many_tags" readonly="1"/>
                         </group>
                     </group>
-                    <!-- GPS coords (optional) -->
-                    <group string="Location (GPS)" col="4">
-                        <field name="latitude"/>
-                        <field name="longitude"/>
+                    <!-- Location -->
+                    <group string="Location">
+                        <group>
+                            <field name="state_id"/>
+                            <field name="city_id"
+                                   domain="[('state_id','=',state_id)]"/>
+                            <field name="address"/>
+                        </group>
+                        <group>
+                            <field name="google_map_link" widget="url"
+                                   placeholder="https://maps.google.com/..."/>
+                        </group>
                     </group>
                     <!-- Services -->
                     <notebook>
@@ -199,6 +218,8 @@
                 <field name="car_id"/>
                 <field name="team_slot"/>
                 <field name="team_id"/>
+                <field name="state_id"/>
+                <field name="city_id"/>
                 <field name="address"/>
                 <field name="status"/>
                 <field name="color"/>
@@ -222,7 +243,14 @@
                                         <i class="fa fa-calendar"/> <field name="service_date"/>
                                     </div>
                                     <div>
-                                        <i class="fa fa-map-marker"/> <field name="address"/>
+                                        <i class="fa fa-map-marker"/>
+                                        <t t-if="record.city_id.raw_value">
+                                            <field name="city_id"/>
+                                            <t t-if="record.state_id.raw_value"> — <field name="state_id"/></t>
+                                        </t>
+                                        <t t-else="">
+                                            <field name="address"/>
+                                        </t>
                                     </div>
                                 </div>
                                 <div class="o_kanban_record_bottom">

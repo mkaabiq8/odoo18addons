@@ -10,6 +10,7 @@
                 <field name="car_id"/>
                 <field name="slot"/>
                 <field name="name"/>
+                <field name="zone_id"/>
                 <field name="member_ids" widget="many2many_tags"/>
                 <field name="appointment_count" string="Appointments"/>
                 <field name="active"/>
@@ -41,6 +42,7 @@
                         <group>
                             <field name="car_id"/>
                             <field name="slot"/>
+                            <field name="zone_id"/>
                             <field name="active"/>
                         </group>
                     </group>

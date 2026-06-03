@@ -46,4 +46,16 @@
               action="action_spa_team"
               sequence="20"/>
 
+    <menuitem id="menu_spa_zones"
+              name="Zones"
+              parent="menu_spa_config"
+              action="action_spa_zone"
+              sequence="30"/>
+
+    <menuitem id="menu_spa_cities"
+              name="Cities"
+              parent="menu_spa_config"
+              action="action_spa_city"
+              sequence="40"/>
+
 </odoo>
