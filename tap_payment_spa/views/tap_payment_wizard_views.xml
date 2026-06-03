@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Tap Payment Wizard ─────────────────────────────────────────── -->
+    <record id="view_tap_payment_wizard_form" model="ir.ui.view">
+        <field name="name">tap.payment.wizard.form</field>
+        <field name="model">tap.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Tap Payment Link">
+                <sheet>
+
+                    <!-- ── Error banner ─────────────────────────────────── -->
+                    <div class="alert alert-danger" role="alert"
+                         invisible="state != 'error'">
+                        <strong>Tap API Error:</strong>
+                        <field name="error_message" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <!-- ── Success banner ───────────────────────────────── -->
+                    <div class="alert alert-success" role="alert"
+                         invisible="state != 'generated'">
+                        <strong>Payment link created!</strong>
+                        Copy the link below and send it to your customer.
+                    </div>
+
+                    <!-- ── Appointment info ─────────────────────────────── -->
+                    <group string="Appointment">
+                        <field name="appointment_id" readonly="1"/>
+                        <field name="customer_name" readonly="1"/>
+                    </group>
+
+                    <!-- ── Payment details (editable before sending) ────── -->
+                    <group string="Payment Details"
+                           invisible="state == 'generated'">
+                        <field name="amount"/>
+                        <field name="currency_code"/>
+                        <field name="phone"
+                               placeholder="+966512345678"/>
+                        <field name="email"
+                               placeholder="customer@example.com"/>
+                        <field name="description"/>
+                    </group>
+
+                    <!-- ── Generated link ───────────────────────────────── -->
+                    <group string="Payment Link" invisible="state != 'generated'">
+                        <field name="charge_id" readonly="1" string="Tap Charge ID"/>
+                        <field name="payment_url" readonly="1" widget="url"
+                               string="Payment URL"/>
+                    </group>
+
+                    <!-- ── Copy helper ──────────────────────────────────── -->
+                    <div invisible="state != 'generated'" class="mt8">
+                        <field name="payment_url" widget="CopyClipboardChar"
+                               readonly="1" nolabel="1"/>
+                    </div>
+
+                </sheet>
+                <footer>
+                    <!-- Generate button: shown only in draft / error states -->
+                    <button name="action_generate_link" type="object"
+                            string="Generate Payment Link"
+                            class="btn-primary"
+                            invisible="state == 'generated'"/>
+
+                    <!-- Re-generate button after success -->
+                    <button name="action_generate_link" type="object"
+                            string="Regenerate Link"
+                            class="btn-secondary"
+                            invisible="state != 'generated'"/>
+
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Payment return page (public, shown after Tap redirect) ────── -->
+    <template id="tap_payment_return_page" name="Tap Payment Return">
+        <t t-call="web.layout">
+            <t t-set="head_website">
+                <style>
+                    body { display: flex; justify-content: center; align-items: center;
+                           min-height: 100vh; background: #f8f9fa; margin: 0; }
+                    .tap-result { max-width: 480px; width: 100%; padding: 2rem;
+                                  background: #fff; border-radius: 8px;
+                                  box-shadow: 0 2px 12px rgba(0,0,0,.1);
+                                  text-align: center; }
+                    .tap-result h2 { margin-bottom: 1rem; }
+                </style>
+            </t>
+            <div class="tap-result">
+                <img src="/web/static/img/logo_inverse.svg" height="48" alt="Logo"
+                     style="margin-bottom:1.5rem"/>
+                <div t-attf-class="alert #{css_class}" role="alert">
+                    <t t-esc="message"/>
+                </div>
+                <t t-if="tap_id">
+                    <p class="text-muted" style="font-size:.85rem">
+                        Reference: <code t-esc="tap_id"/>
+                    </p>
+                </t>
+            </div>
+        </t>
+    </template>
+
+</odoo>

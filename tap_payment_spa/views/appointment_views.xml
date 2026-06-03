@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Inherit appointment form: add Tap button + payment tab ─────── -->
+    <record id="view_spa_appointment_form_tap_inherit" model="ir.ui.view">
+        <field name="name">spa.appointment.form.tap.payment</field>
+        <field name="model">spa.appointment</field>
+        <field name="inherit_id" ref="spa_dispatch.view_spa_appointment_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add button in header, after the Cancel button -->
+            <button name="action_cancel" position="after">
+                <button name="action_tap_payment_link"
+                        type="object"
+                        string="💳 Tap Payment Link"
+                        class="btn-primary"
+                        invisible="status in ['cancelled'] or total_amount &lt;= 0"/>
+            </button>
+
+            <!-- Add a Payment tab in the notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Tap Payment" name="tap_payment">
+                    <group>
+                        <group string="Payment Status">
+                            <field name="tap_charge_id" readonly="1"/>
+                            <field name="tap_payment_status" readonly="1"/>
+                            <field name="tap_is_paid" readonly="1" widget="boolean"/>
+                            <field name="tap_payment_generated_at" readonly="1"/>
+                        </group>
+                        <group string="Payment Link">
+                            <field name="tap_payment_url" readonly="1" widget="url"
+                                   string="Payment URL"/>
+                        </group>
+                    </group>
+
+                    <!-- Copy link button shown only when a link exists -->
+                    <div invisible="not tap_payment_url" class="mt8">
+                        <field name="tap_payment_url"
+                               widget="CopyClipboardChar"
+                               readonly="1"
+                               nolabel="1"/>
+                        <button name="action_tap_payment_link"
+                                type="object"
+                                string="Regenerate Link"
+                                class="btn-secondary mt8"
+                                invisible="status == 'cancelled'"/>
+                    </div>
+                    <div invisible="tap_payment_url" class="text-muted mt8">
+                        No payment link generated yet. Click
+                        <b>💳 Tap Payment Link</b> in the header to create one.
+                    </div>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ── Inherit appointment list: show Tap payment status column ───── -->
+    <record id="view_spa_appointment_list_tap_inherit" model="ir.ui.view">
+        <field name="name">spa.appointment.list.tap.payment</field>
+        <field name="model">spa.appointment</field>
+        <field name="inherit_id" ref="spa_dispatch.view_spa_appointment_list"/>
+        <field name="arch" type="xml">
+            <field name="priority" position="before">
+                <field name="tap_payment_status" optional="show"
+                       widget="badge"
+                       decoration-success="tap_payment_status == 'CAPTURED'"
+                       decoration-danger="tap_payment_status in ('DECLINED','FAILED','VOID')"
+                       decoration-info="tap_payment_status == 'INITIATED'"
+                       string="Tap Pay"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
